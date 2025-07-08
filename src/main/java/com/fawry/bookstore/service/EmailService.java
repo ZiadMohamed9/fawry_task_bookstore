@@ -9,7 +9,7 @@ public class EmailService {
     public void sendEmail(Book book, User user) {
         String email = user.getEmail();
         String bookTitle = book.getTitle();
-        String message = "Dear " + user.getUsername() + ",\n\n" +
+        String message = "Dear " + user.getName() + ",\n\n" +
                          "Thank you for purchasing '" + bookTitle + "'.\n" +
                          "We hope you enjoy your reading experience!\n\n" +
                          "Best regards,\n" +

@@ -21,17 +21,14 @@ public class AuthorService {
                 .orElseThrow(() -> new RuntimeException("Author not found with name: " + name));
     }
 
-    @Transactional
     public void addAuthor(Author author) {
         authorRepository.save(author);
     }
 
-    @Transactional
     public void deleteAuthor(Long id) {
         authorRepository.deleteById(id);
     }
 
-    @Transactional
     public void updateAuthor(Long id, Author author) {
         Author existingAuthor = authorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Author not found with ID: " + id));

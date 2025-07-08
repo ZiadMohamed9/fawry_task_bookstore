@@ -3,12 +3,13 @@ package com.fawry.bookstore;
 import com.fawry.bookstore.entity.Author;
 import com.fawry.bookstore.entity.Book;
 import com.fawry.bookstore.entity.BookType;
+import com.fawry.bookstore.entity.Role;
 import com.fawry.bookstore.request.AddBookRequest;
 import com.fawry.bookstore.request.AddUserRequest;
 import com.fawry.bookstore.request.BuyBookRequest;
 import com.fawry.bookstore.service.AuthorService;
 import com.fawry.bookstore.service.BookService;
-import com.fawry.bookstore.service.BuyingService;
+import com.fawry.bookstore.service.PurchaseService;
 import com.fawry.bookstore.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Configuration
 @RequiredArgsConstructor
@@ -24,19 +26,23 @@ public class TestOperations {
     private final UserService userService;
     private final BookService bookService;
     private final AuthorService authorService;
-    private final BuyingService buyingService;
+    private final PurchaseService buyingService;
 
     @Bean
     public CommandLineRunner testRunner() {
-        return args -> {
+        return _ -> {
             try {
                 testAddingBook();
 
-                testDeletingBook();
+//                testDeletingBook();
 
-                testDeletingOutdatedBooks();
+//                testDeletingOutdatedBooks();
 
-                testAddingAuthor();
+//                testAddingAuthor();
+
+//                testAddingAuthorWithBooks();
+
+                testAddUsers();
 
                 testBuyingBook();
             }
@@ -47,9 +53,36 @@ public class TestOperations {
     }
 
     void testAddingBook() {
-        Book book = new Book("1234567890", "Test Book", BookType.E_BOOK, LocalDate.of(2023, 1, 1), 9.99, 100);
-        bookService.addBook(book);
-        System.out.println("Book added successfully: " + bookService.getBookById("1234567890").getTitle() );
+        bookService.addBook(AddBookRequest.builder()
+                .isbn("1234567800")
+                .title("Old Book")
+                .bookType(BookType.PAPER_BOOK)
+                .publicationDate(LocalDate.of(2015, 1, 1))
+                .price(19.99)
+                .stock(50)
+                .build());
+        System.out.println("Book added successfully: " + bookService.getBookById("1234567800").getTitle());
+
+        bookService.addBook(AddBookRequest.builder()
+                .isbn("1234567801")
+                .title("Recent Book")
+                .bookType(BookType.E_BOOK)
+                .publicationDate(LocalDate.of(2023, 1, 1))
+                .price(9.99)
+                .stock(100)
+                .build());
+        System.out.println("Book added successfully: " + bookService.getBookById("1234567801").getTitle());
+
+        bookService.addBook(AddBookRequest.builder()
+                .isbn("1234567802")
+                .title("Another Old Book")
+                .bookType(BookType.PAPER_BOOK)
+                .publicationDate(LocalDate.of(2010, 1, 1))
+                .price(15.99)
+                .stock(30)
+                .build()
+        );
+        System.out.println("Book added successfully: " + bookService.getBookById("1234567802").getTitle());
     }
 
     void testDeletingBook() {
@@ -59,12 +92,6 @@ public class TestOperations {
     }
 
     void testDeletingOutdatedBooks() {
-        // first, add some books to test deletion
-        bookService.addBook(new Book("1234567800", "Old Book", BookType.E_BOOK, LocalDate.of(2015, 1, 1), 5.99, 50));
-        bookService.addBook(new Book("1234567801", "Old Book 2", BookType.E_BOOK, LocalDate.of(2013, 1, 1), 10.99, 20));
-        bookService.addBook(new Book("1234567801", "Recent Book", BookType.E_BOOK, LocalDate.of(2023, 1, 1), 15.99, 30));
-        System.out.println("Books added for deletion test.");
-
         int years = 5;
         List<Book> deletedBooks = bookService.deleteOutDatedBooks(years);
         deletedBooks.forEach(book -> System.out.println("Book deleted successfully: " + book.getTitle()));
@@ -75,28 +102,36 @@ public class TestOperations {
         System.out.println("Author added successfully: " + authorService.getAuthorByName("John Doe").getName());
     }
 
-    void testBuyingBook() {
+    void testAddingAuthorWithBooks() {
+        Author author = new Author("Jane Smith", LocalDate.of(1990, 5, 15));
+        authorService.addAuthor(author);
+        System.out.println("Author added successfully: " + author.getName());
+
+        bookService.addBook(AddBookRequest.builder()
+                .isbn("1234567899")
+                .title("Jane's Book")
+                .bookType(BookType.E_BOOK)
+                .publicationDate(LocalDate.of(2022, 6, 1))
+                .price(12.99)
+                .stock(200)
+                .authors(Set.of(author))
+                .build());
+        System.out.println("Book added successfully for author: " + author.getName());
+    }
+
+    void testAddUsers() {
         var request = AddUserRequest.builder()
-                .username("testUser")
+                .name("testUser")
                 .email("user@email.com")
-                .password("<PASSWORD>")
-                .role("USER")
+                .password("password123")
+                .role(Role.USER)
                 .address("Test Address")
                 .build();
         userService.addUser(request);
-        System.out.println("User added successfully: " + userService.getUserByUsername("testUser").getUsername());
+        System.out.println("User added successfully: " + userService.getUserByName("testUser").getName());
+    }
 
-        var bookRequest = AddBookRequest.builder()
-                .isbn("1234567800")
-                .title("Test Book")
-                .bookType(BookType.E_BOOK)
-                .publicationDate(LocalDate.of(2023, 1, 1))
-                .price(9.99)
-                .stock(100)
-                .build();
-        bookService.addBook(bookRequest);
-        System.out.println("Book added successfully: " + bookService.getBookById("1234567800").getTitle());
-
+    void testBuyingBook() {
         var buyingRequest = BuyBookRequest.builder()
                 .isbn("1234567800")
                 .quantity(1)

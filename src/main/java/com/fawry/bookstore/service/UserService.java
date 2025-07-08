@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
 
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username)
+    public User getUserByName(String username) {
+        return userRepository.findByName(username)
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
     }
 
@@ -28,10 +28,9 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
     }
 
-    @Transactional
     public void addUser(@Valid AddUserRequest request) {
         User user = new User(
-                request.getUsername(),
+                request.getName(),
                 request.getEmail(),
                 request.getPassword(),
                 request.getRole(),
@@ -40,17 +39,15 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
 
-    @Transactional
     public void updateUser(Long id, @Valid AddUserRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
 
-        user.setUsername(request.getUsername());
+        user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
         user.setRole(request.getRole());

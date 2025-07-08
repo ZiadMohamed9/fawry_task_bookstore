@@ -14,7 +14,7 @@ public class BookPurchaseStrategyFactory {
     private final Map<String, BookPurchaseStrategy> strategies;
 
     public BookPurchaseStrategy getStrategy(BookType bookType) {
-        BookPurchaseStrategy strategy = strategies.get(bookType.toString());
+        BookPurchaseStrategy strategy = strategies.get(bookType.name());
         if (strategy == null) {
             throw new UnsupportedBookType("Unknown book type: " + bookType);
         }

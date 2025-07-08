@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -25,16 +26,15 @@ public class BookService {
         return bookRepository.findAll();
     }
 
-    public Book getByAuthor(String authorId) {
-        return bookRepository.findByAuthor(authorId)
-                .orElseThrow(() -> new BookNotFoundException("Book not found for author ID: " + authorId));
+    public List<Book> getByAuthor(Long authorId) {
+        return bookRepository.findAllByAuthorsId(authorId);
     }
 
     public List<Book> findBooksByPriceBetween(double priceAfter, double priceBefore) {
         return bookRepository.findBooksByPriceBetween(priceAfter, priceBefore);
     }
 
-//    @Transactional
+    @Transactional
     public void addBook(@Valid AddBookRequest request){
         Book book = new Book(
                 request.getIsbn(),
@@ -47,10 +47,6 @@ public class BookService {
         bookRepository.save(book);
     }
 
-    public void addBook(Book book) {
-        bookRepository.save(book);
-    }
-
     @Transactional
     public void deleteBook(String isbn){
         bookRepository.deleteById(isbn);
@@ -58,11 +54,13 @@ public class BookService {
 
     @Transactional
     public List<Book> deleteOutDatedBooks(int years) {
-        List<Book> outdatedBooks = bookRepository.findOutdatedBooks(years);
-        bookRepository.deleteOutdatedBooks(years);
+        LocalDate cutOffDate = LocalDate.now().minusYears(years);
+        List<Book> outdatedBooks = bookRepository.findByPublicationDateBefore(cutOffDate);
+        bookRepository.deleteByPublicationDateBefore(cutOffDate);
         return outdatedBooks;
     }
 
+    @Transactional
     public void updateBook(String isbn, @Valid AddBookRequest request) {
         Book book = bookRepository.findById(isbn)
                 .orElseThrow(() -> new RuntimeException("Book not found"));

@@ -16,11 +16,11 @@ import java.util.Set;
 @Table(indexes = @Index(name = "idx_book_price", columnList = "price"))
 public class Book {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String isbn;
     private String title;
 
     @Column(name = "book_type")
+    @Enumerated(EnumType.STRING)
     private BookType bookType;
 
     @Column(name = "publication_date")

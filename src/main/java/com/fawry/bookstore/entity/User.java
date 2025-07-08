@@ -1,9 +1,6 @@
 package com.fawry.bookstore.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,14 +13,16 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
+    private String name;
     private String email;
     private String password;
-    private String role;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
     private String address;
 
-    public User(String username, String email, String password, String role, String address) {
-        this.username = username;
+    public User(String username, String email, String password, Role role, String address) {
+        this.name = username;
         this.email = email;
         this.password = password;
         this.role = role;

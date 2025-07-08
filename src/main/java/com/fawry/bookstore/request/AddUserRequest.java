@@ -1,5 +1,6 @@
 package com.fawry.bookstore.request;
 
+import com.fawry.bookstore.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import org.hibernate.validator.constraints.Length;
 @Builder
 public class AddUserRequest {
     @NotNull
-    private String username;
+    private String name;
 
     @Email
     private String email;
@@ -20,7 +21,7 @@ public class AddUserRequest {
     private String password;
 
     @NotNull
-    private String role;
+    private Role role;
 
     @NotNull
     private String address;

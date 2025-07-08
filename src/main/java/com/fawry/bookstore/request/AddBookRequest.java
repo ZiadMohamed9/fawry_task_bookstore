@@ -1,5 +1,6 @@
 package com.fawry.bookstore.request;
 
+import com.fawry.bookstore.entity.Author;
 import com.fawry.bookstore.entity.BookType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -7,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
@@ -19,6 +21,8 @@ public class AddBookRequest {
 
     @NotNull
     private BookType bookType;
+
+    private Set<Author> authors;
 
     @NotNull
     private LocalDate publicationDate;
