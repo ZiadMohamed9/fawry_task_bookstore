@@ -16,6 +16,11 @@ public class AuthorService {
                 .orElseThrow(() -> new RuntimeException("Author not found with ID: " + id));
     }
 
+    public Author getAuthorByName(String name) {
+        return authorRepository.findByName(name)
+                .orElseThrow(() -> new RuntimeException("Author not found with name: " + name));
+    }
+
     @Transactional
     public void addAuthor(Author author) {
         authorRepository.save(author);

@@ -22,7 +22,11 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String isbn;
     private String title;
+
+    @Column(name = "book_type")
     private BookType bookType;
+
+    @Column(name = "publication_date")
     private LocalDate publicationDate;
     private double price;
     private int stock;

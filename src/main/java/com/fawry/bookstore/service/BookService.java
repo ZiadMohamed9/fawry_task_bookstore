@@ -16,6 +16,15 @@ import java.util.List;
 public class BookService {
     private final BookRepository bookRepository;
 
+    public Book getBookById(String isbn) {
+        return bookRepository.findById(isbn)
+                .orElseThrow(() -> new BookNotFoundException("Book not found with ISBN: " + isbn));
+    }
+
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
+    }
+
     public Book getByAuthor(String authorId) {
         return bookRepository.findByAuthor(authorId)
                 .orElseThrow(() -> new BookNotFoundException("Book not found for author ID: " + authorId));
@@ -25,7 +34,7 @@ public class BookService {
         return bookRepository.findBooksByPriceBetween(priceAfter, priceBefore);
     }
 
-    @Transactional
+//    @Transactional
     public void addBook(@Valid AddBookRequest request){
         Book book = new Book(
                 request.getIsbn(),
@@ -38,6 +47,10 @@ public class BookService {
         bookRepository.save(book);
     }
 
+    public void addBook(Book book) {
+        bookRepository.save(book);
+    }
+
     @Transactional
     public void deleteBook(String isbn){
         bookRepository.deleteById(isbn);
@@ -46,7 +59,7 @@ public class BookService {
     @Transactional
     public List<Book> deleteOutDatedBooks(int years) {
         List<Book> outdatedBooks = bookRepository.findOutdatedBooks(years);
-        outdatedBooks.forEach(book -> bookRepository.deleteById(book.getIsbn()));
+        bookRepository.deleteOutdatedBooks(years);
         return outdatedBooks;
     }
 

@@ -20,7 +20,12 @@ public class Author {
     private String name;
     private LocalDate birthDate;
 
-    @ManyToMany(mappedBy = "authors", fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+            name = "book_author",
+            joinColumns = @JoinColumn(name = "author_id"),
+            inverseJoinColumns = @JoinColumn(name = "book_isbn")
+    )
     Set<Book> books;
 
     public Author(String name, LocalDate birthDate) {

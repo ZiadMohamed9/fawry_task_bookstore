@@ -3,11 +3,13 @@ package com.fawry.bookstore.request;
 import com.fawry.bookstore.entity.BookType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
+@Builder
 public class AddBookRequest {
     @NotNull
     private String isbn;
