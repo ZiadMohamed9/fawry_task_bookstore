@@ -13,10 +13,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(indexes = {
-        @Index(name = "idx_book_isbn", columnList = "isbn"),
-        @Index(name = "idx_book_price", columnList = "price")
-})
+@Table(indexes = @Index(name = "idx_book_price", columnList = "price"))
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +28,7 @@ public class Book {
     private double price;
     private int stock;
 
-    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "book_author",
             joinColumns = @JoinColumn(name = "book_isbn"),
