@@ -2,7 +2,6 @@ package com.fawry.bookstore.service.purchasestrategy;
 
 import com.fawry.bookstore.entity.BookType;
 import com.fawry.bookstore.exception.UnsupportedBookType;
-import com.fawry.bookstore.service.BookPurchaseStrategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

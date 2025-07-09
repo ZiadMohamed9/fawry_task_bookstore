@@ -1,9 +1,6 @@
 package com.fawry.bookstore;
 
-import com.fawry.bookstore.entity.Author;
-import com.fawry.bookstore.entity.Book;
-import com.fawry.bookstore.entity.BookType;
-import com.fawry.bookstore.entity.Role;
+import com.fawry.bookstore.entity.*;
 import com.fawry.bookstore.request.AddBookRequest;
 import com.fawry.bookstore.request.AddUserRequest;
 import com.fawry.bookstore.request.BuyBookRequest;
@@ -42,9 +39,13 @@ public class TestOperations {
 
 //                testAddingAuthorWithBooks();
 
-                testAddUsers();
+//                testAddUser();
 
-                testBuyingBook();
+//                testBuyingBook();
+
+//                testBuyPaperBookOutOfStock();
+
+                testBuyingEBook();
             }
             catch (Exception e) {
                 System.err.println("Error during test operations: " + e.getMessage());
@@ -119,7 +120,7 @@ public class TestOperations {
         System.out.println("Book added successfully for author: " + author.getName());
     }
 
-    void testAddUsers() {
+    User testAddUser() {
         var request = AddUserRequest.builder()
                 .name("testUser")
                 .email("user@email.com")
@@ -128,17 +129,64 @@ public class TestOperations {
                 .address("Test Address")
                 .build();
         userService.addUser(request);
-        System.out.println("User added successfully: " + userService.getUserByName("testUser").getName());
+        User testUser = userService.getUserByName("testUser");
+        System.out.println("User added successfully: " + testUser.getName());
+        return testUser;
     }
 
-    void testBuyingBook() {
-        var buyingRequest = BuyBookRequest.builder()
-                .isbn("1234567800")
-                .quantity(1)
-                .email("user@email.com")
-                .address("Test Address")
+    void testBuyingEBook() {
+        User user = userService.getUserByName("testUser");
+        Book ebook = bookService.getBookById("1234567801");
+        BuyBookRequest request = BuyBookRequest.builder()
+                .book(ebook)
+                .user(user)
                 .build();
-        double paidAmount = buyingService.buyBook(buyingRequest);
+        double paidAmount = buyingService.buyBook(request);
         System.out.println("Book purchased successfully. Paid amount: " + paidAmount);
+    }
+
+    void testBuyPaperBookOutOfStock() {
+        User user = userService.getUserByName("testUser");
+        Book paperBook = bookService.getBookById("1234567898");
+        BuyBookRequest request = BuyBookRequest.builder()
+                .book(paperBook)
+                .user(user)
+                .quantity(10)
+                .build();
+        try {
+            double paidAmount = buyingService.buyBook(request);
+            System.out.println("Book purchased successfully. Paid amount: " + paidAmount);
+        } catch (Exception e) {
+            System.err.println("Error during book purchase: " + e.getMessage());
+        }
+    }
+
+    void testBuyEbook() {
+        User user = userService.getUserByName("testUser");
+        Book ebook = bookService.getBookById("1234567801");
+        BuyBookRequest request = BuyBookRequest.builder()
+                .book(ebook)
+                .user(user)
+                .quantity(1) // Stock typically doesn't limit e-books
+                .build();
+        try {
+            double paidAmount = buyingService.buyBook(request);
+            System.out.println("E-book purchased successfully. Paid amount: " + paidAmount);
+        } catch (Exception e) {
+            System.err.println("Error during e-book purchase: " + e.getMessage());
+        }
+    }
+
+    private Book addOutOfStockBook() {
+        AddBookRequest outOfStockBook = AddBookRequest.builder()
+                .isbn("1234567898")
+                .title("Out of Stock Book")
+                .bookType(BookType.PAPER_BOOK)
+                .publicationDate(LocalDate.of(2023, 1, 1))
+                .price(29.99)
+                .stock(0) // Set stock to 0 to simulate out of stock
+                .build();
+        bookService.addBook(outOfStockBook);
+        return bookService.getBookById("1234567898");
     }
 }

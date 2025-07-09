@@ -14,4 +14,6 @@ public interface BookRepository extends JpaRepository<Book, String> {
     List<Book> findByPublicationDateBefore(LocalDate cutOffDate);
 
     void deleteByPublicationDateBefore(LocalDate cutOffDate);
+
+    boolean existsByIsbn(String isbn);
 }

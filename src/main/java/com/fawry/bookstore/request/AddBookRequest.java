@@ -2,6 +2,7 @@ package com.fawry.bookstore.request;
 
 import com.fawry.bookstore.entity.Author;
 import com.fawry.bookstore.entity.BookType;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;

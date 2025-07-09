@@ -21,7 +21,7 @@ public class Purchase {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
+    @JoinColumn(name = "book_isbn", nullable = false)
     private Book book;
     private int quantity;
     private double paidAmount;

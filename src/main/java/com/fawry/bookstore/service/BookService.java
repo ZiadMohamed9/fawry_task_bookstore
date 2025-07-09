@@ -1,6 +1,7 @@
 package com.fawry.bookstore.service;
 
 import com.fawry.bookstore.entity.Book;
+import com.fawry.bookstore.entity.BookType;
 import com.fawry.bookstore.exception.BookNotFoundException;
 import com.fawry.bookstore.repository.BookRepository;
 import com.fawry.bookstore.request.AddBookRequest;
@@ -44,6 +45,11 @@ public class BookService {
                 request.getPrice(),
                 request.getStock()
         );
+        if ( bookRepository.existsByIsbn( book.getIsbn() ) )
+            throw new RuntimeException("Book with ISBN " + book.getIsbn() + " already exists");
+        if (book.getBookType() == BookType.E_BOOK || book.getBookType() == BookType.SHOWCASE_BOOK)
+            book.setStock(0);
+
         bookRepository.save(book);
     }
 

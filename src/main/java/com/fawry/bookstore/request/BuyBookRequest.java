@@ -1,5 +1,7 @@
 package com.fawry.bookstore.request;
 
+import com.fawry.bookstore.entity.Book;
+import com.fawry.bookstore.entity.User;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -9,14 +11,11 @@ import lombok.Data;
 @Builder
 public class BuyBookRequest {
     @NotNull
-    private String isbn;
+    private Book book;
 
-    @Min(1)
+    @NotNull
+    private User user;
+
+    @Min(0)
     private int quantity;
-
-    @NotNull
-    private String email;
-
-    @NotNull
-    private String address;
 }

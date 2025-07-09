@@ -11,6 +11,7 @@ import com.fawry.bookstore.repository.BookRepository;
 import com.fawry.bookstore.repository.PurchaseRepository;
 import com.fawry.bookstore.repository.UserRepository;
 import com.fawry.bookstore.request.BuyBookRequest;
+import com.fawry.bookstore.service.purchasestrategy.BookPurchaseStrategy;
 import com.fawry.bookstore.service.purchasestrategy.BookPurchaseStrategyFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,16 @@ public class PurchaseService {
     private final BookPurchaseStrategyFactory strategyFactory;
 
     public double buyBook(@Valid BuyBookRequest request) {
-        Book book = bookRepository.findById(request.getIsbn())
-                .orElseThrow(() -> new BookNotFoundException("Book not found with ISBN: " + request.getIsbn()));
+        Book book = request.getBook();
+        User user = request.getUser();
+        if (book == null || user == null)
+            throw new IllegalArgumentException("Book and User must not be null");
+
+        if (!bookRepository.existsByIsbn(book.getIsbn()))
+            throw new BookNotFoundException("Book not found with ISBN: " + book.getIsbn());
+
+        if (!userRepository.existsByEmail(user.getEmail()))
+            throw new UserNotFoundException("User not found with email: " + user.getEmail());
 
         BookType bookType = book.getBookType();
         if (bookType == BookType.SHOWCASE_BOOK)
@@ -34,10 +43,6 @@ public class PurchaseService {
 
         BookPurchaseStrategy strategy = strategyFactory.getStrategy(bookType);
         double paidAmount = strategy.purchase(request);
-
-        // create a purchase record
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.getEmail()));
 
         Purchase purchase = new Purchase(user, book, request.getQuantity(), paidAmount);
         purchaseRepository.save(purchase);

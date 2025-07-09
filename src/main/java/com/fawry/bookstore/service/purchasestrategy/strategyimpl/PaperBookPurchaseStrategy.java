@@ -1,12 +1,13 @@
 package com.fawry.bookstore.service.purchasestrategy.strategyimpl;
 
-import com.fawry.bookstore.exception.BookNotFoundException;
+import com.fawry.bookstore.entity.Book;
+import com.fawry.bookstore.entity.User;
+import com.fawry.bookstore.exception.InsufficientQuantityException;
 import com.fawry.bookstore.exception.OutOfStockException;
-import com.fawry.bookstore.exception.UserNotFoundException;
 import com.fawry.bookstore.repository.BookRepository;
 import com.fawry.bookstore.repository.UserRepository;
 import com.fawry.bookstore.request.BuyBookRequest;
-import com.fawry.bookstore.service.BookPurchaseStrategy;
+import com.fawry.bookstore.service.purchasestrategy.BookPurchaseStrategy;
 import com.fawry.bookstore.service.ShippingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,17 +23,24 @@ public class PaperBookPurchaseStrategy implements BookPurchaseStrategy {
     @Override
     @Transactional
     public double purchase(BuyBookRequest request) {
-        var book = bookRepository.findById(request.getIsbn())
-                .orElseThrow(() -> new BookNotFoundException("Book not found with ISBN: " + request.getIsbn()));
-        var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.getEmail()));
+        Book book = request.getBook();
+        User user = request.getUser();
 
         int quantity = request.getQuantity();
-        if (book.getStock() < request.getQuantity()) {
-            throw new OutOfStockException("Book: " + book.getTitle() + " is out of stock.");
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero.");
         }
 
-        book.setStock(book.getStock() - quantity);
+        int stock = book.getStock();
+        if (stock == 0) {
+            throw new OutOfStockException("Book: " + book.getTitle() + " is out of stock.");
+        }
+        if (stock < quantity) {
+            throw new InsufficientQuantityException(
+                "Insufficient stock for book: " + book.getTitle() + ". Requested: " + quantity + ", Available: " + stock);
+        }
+
+        book.setStock(stock - quantity);
         bookRepository.save(book);
 
         double totalPrice = book.getPrice() * quantity;

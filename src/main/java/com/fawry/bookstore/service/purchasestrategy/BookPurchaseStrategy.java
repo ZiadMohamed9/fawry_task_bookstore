@@ -1,4 +1,4 @@
-package com.fawry.bookstore.service;
+package com.fawry.bookstore.service.purchasestrategy;
 
 import com.fawry.bookstore.request.BuyBookRequest;
 
